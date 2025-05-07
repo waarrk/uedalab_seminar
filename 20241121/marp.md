@@ -65,11 +65,11 @@ footer {
 
 # 自律ロボットの経路計画のための<br>GPUによる高速な価値反復処理の実装
 
-## ROS2ノードにおけるGPUの利用
+## ROS2ノードの移植状況の報告
 
 千葉工業大学 上田研究室 22C1704
 
-2024/10/03 鷲尾 優作
+2024/11/17 鷲尾 優作
 
 <br />
 
@@ -84,11 +84,13 @@ footer {
 2. 高速化へのアプローチ: GPUの利用
 3. 価値反復ROSパッケージに対するGPUの適用の提案
 4. 研究目的
-5. ビルド方法の検討
-6. CMake3.27によるCUDAのサポート
-7. ROS2ノードに対するCUDAの適用テスト
-8. テスト結果
-9. まとめ
+5. 前回までに行ったこと
+6. value_iteration2パッケージの概要
+7. ValueIterator.cppのコードリーディング
+8. CMakelists.txtの変更
+9. value_iteration_kernel.cuの作成
+10. 直面している問題（ビルドエラー）
+11. まとめ
 
 ---
 
@@ -140,68 +142,98 @@ footer {
 
 ---
 
-## ビルド方法の検討
+## 前回までに行ったこと
 
-- 通常GPUを利用するためにはCUDAとよばれるフレームワークを使用
-  - CUDAは`nvcc`コマンドを使用してコンパイルする
-  - ROS2のノードをCUDAでコンパイルする方法が不明
+- ROS2のcolcon buildでCUDAを使用する方法を検討
+  - `find_library`関数を使用することが適していることを確認
+
+---
+
+## value_iteration2パッケージの概要
+
+- 価値反復を用いた自律ロボットの経路計画を行うROSパッケージ [2]
+  - Action.cpp/State.cpp ロボットが取る行動と状態を定義したクラス
+  - StateTransition.cpp 状態遷移を定義したクラス
+  - SweepWorkerStatus.cpp 価値反復の進捗状況を保存するクラス
+  - ValueIterator.cpp: 価値反復アルゴリズムの実装
+  - ValueIteratorLocal.cpp: 局所的な価値反復アルゴリズムの実装
+  - vi_node.cpp: プログラムをROS2ノードとして実行するための実装
 
 <div class="conclusion">
-ROS2のcolcon buildでCUDAを使用する方法を検討した
+CUDA化するにあたって、まずValueIterator.cppから手をつける必要がありそう
 </div>
 
 ---
 
-## CMake3.27によるCUDAのサポート
+## ValueIterator.cpp<br>コードリーディング
 
-- CMakeには、CUDAのビルドをサポートする機能がある
-  - これを利用すれば、CUDAを使用するノードをビルドできるのではないか
+`ValueIterator::valueIteration`関数が価値反復のメイン処理
 
-これまでは`find_library`関数でCUDAのライブラリを探していたが、CMake3.27から
-は他の言語と同様に直接サポートされるよう変わったらしい
-新しい記法は以下のとおり
+これを、`ValueIterator::valueIterationWorker`経由でvi_node.cppから呼び出すことで並列実行している（赤枠）
+
+<div class="conclusion">
+valueIterationをGPUで動作できるように書き換える必要
+</div>
+
+![bg left](./images/vi.png)
+
+---
+
+## CMakelists.txtの変更
+
+- 次のようにCUDAのビルドを追加
 
 ```cmake
-cmake_minimum_required(VERSION 3.27)
-project(PROJECT_NAME LANGUAGES CXX CUDA)
+
+set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -arch=sm_86")
+set(CUDA_SOURCES src/value_iteration_kernel.cu)
+cuda_add_library(value_iteration_kernel STATIC ${CUDA_SOURCES})
+target_link_libraries(vi_node
+  value_iteration_kernel
+  rclcpp::rclcpp
+)
 ```
 
 ---
 
-## ROS2ノードに対するCUDAの適用テスト
+## value_iteration_kernel.cuの作成
 
-- システムのCPU使用量やメモリ使用量をpublishする、system_monitor_node に
-CUDAで読み出したGPU情報を付加して試す
-- そのためにどういう実験をしたのかを書く
-  - CUDAコードをコンパイルできるか
-  - 情報が読み出せるか
+ValueIterator.cppから、`ValueIterator::valueIteration`を動作させるためにCUDAカーネル化すべきと思われる3関数を移植
 
-<div class="conclusion">
-ビルドが成功しGPU情報が読み出せれば、ROS2ノードでCUDAが利用可能といえる
-</div>
+- `actionCost`、`valueIterationKernel`、`setStateKernel`を定義
+  - `actionCost`は行動のコストを計算（CPU版と同じ）
+  - `valueIterationKernel`は価値反復のメイン処理
+  - `setStateKernel`は状態を更新（CPU版と同じ）
+
+- ファイルを認識して、CUDAのビルドが走っていることは確認
+　- ただし、現在ビルドエラーが発生している
 
 ---
 
-## テスト結果
+## 直面している問題（ビルドエラー）
 
-- GPUの名称や使用率、メモリ使用量が正常に読み出せた
-- CMakeを書くだけで、ROS2ノードにCUDAを適用することが可能であることが確認できた
+- CUDAでは、C++のvectorを使用することができない
+  - `std::vector`を使用している部分を普通の配列に書き換える必要がある
 
-<div class="conclusion">
-ROS2ノードにCUDAを適用することが可能であることが確認できた
-</div>
+- 例えば、`Action`クラスの`_state_transitions`を`std::vector`で定義している部分
+  - 影響範囲が広いため、書き換えが大変で苦戦中
+
+```cpp
+class Action{
+public:
+ // その他の定義
+ std::vector< std::vector<StateTransition> > _state_transitions;
+};
+```
 
 ---
 
 ## まとめ
 
 - 価値反復を用いたROSパッケージに対してGPUを適用することを提案
-- CMake3.27によるCUDAのサポートを利用し、ROS2ノードにCUDAを適用する方法を検討
-- システムのCPU使用量やメモリ使用量をpublishする、system_monitor_node にCUDAで読み出したGPU情報を付加してテスト
-- テスト結果、ROS2ノードにCUDAを適用することが可能であることが確認できた
-- 今後の展望
-  - 価値反復ROSパッケージのGPU化方法の検討
-    - どこをどう書き直せばいいのかコードリーディングを進める
+- ValueIterator.cppからCUDA化を進めている
+- 現在ビルドエラーが発生している
+- ビルドエラーを解消しつつ、ユニットテストを行い、問題が散らからないように移植を進めたい
 
 ---
 
