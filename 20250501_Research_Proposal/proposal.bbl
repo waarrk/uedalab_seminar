@@ -1,13 +1,31 @@
 \begin{thebibliography}{1}
 
+\bibitem{ESAHeraa1:online}
+Esa - hera asteroid mission’s cubesat passengers signal home.
+\newblock \url{https://www.esa.int/Space_Safety/Hera/Hera_asteroid_mission_s_CubeSat_passengers_signal_home}, accessed 2025-05-07.
+
+\bibitem{ESARoset23:online}
+Esa - rosetta.
+\newblock \url{https://www.esa.int/Science_Exploration/Space_Science/Rosetta}, accessed 2025-05-07.
+
 \bibitem{iso17981}
 {International Organization for Standardization}.
 \newblock Iso 17981:2024 space systems ― cube satellite (cubesat) interface.
 \newblock {\em ISO Standards}, 2024.
 
+\bibitem{Krause2022}
+C.~Krause, U.~Auster, J.~P. Bibring, J.~Biele, C.~Cenac-Morthe, F.~Cordero, B.~Cozzoni, C.~Dudal, D.~Embacher, C.~Fantinati, H.-H. Fischer, K.~H. Glassmeier, D.~Granena, M.~Grott, J.~T. Grundmann, V.~Hamm, D.~Hercik, T.-M. Ho, R.~Jaumann, K.~Kayal, J.~Knollenberg, O.~K{\"u}chemann, C.~Lange, L.~Lorda, M.~Maibaum, D.~May, Y.~Mimasu, A.~Moussi, T.~Okada, J.~Reill, T.~Saiki, K.~Sasaki, M.~Schlotterer, N.~Schmitz, N.~Toth, Y.~Tsuda, S.~Ulamec, T.~Yoshimitsu, S.~Watanabe, and F.~Wolff.
+\newblock {\em MASCOT---A Mobile Lander On-board the Hayabusa2 Spacecraft---Operations on Ryugu}, pp. 559--575.
+\newblock Springer International Publishing, Cham, 2022.
+
 \bibitem{minelva:online}
 宇宙航空研究開発機構.
 \newblock アポフィス観測の国際状況.
+
+\bibitem{探査ロボット「ミ5:online}
+宇宙航空研究開発機構（JAXA）宇宙科学研究所.
+\newblock 探査ロボット「ミネルバ」の放出 | 日本の宇宙開発の歴史 | isas.
+\newblock \url{https://www.isas.jaxa.jp/j/japan_s_history/chapter09/06/09.shtml}, accessed 2025-05-07.
 
 \bibitem{mineruba}
 宇宙航空研究開発機構宇宙科学研究所.
