@@ -12,6 +12,10 @@ Esa - rosetta.
 Spacehopper - legged locomotion for low-gravity environments ethz.
 \newblock \url{https://spacehopper.ethz.ch/}, accessed 2025-05-08.
 
+\bibitem{小型着陸機MAS63:online}
+小型着陸機mascot | トピックス | jaxa はやぶさ２プロジェクト.
+\newblock \url{https://www.hayabusa2.jaxa.jp/topics/20181002_MSC/}, accessed 2025-05-08.
+
 \bibitem{iso17981}
 {International Organization for Standardization}.
 \newblock Iso 17981:2024 space systems ― cube satellite (cubesat) interface.
@@ -25,6 +29,7 @@ C.~Krause, U.~Auster, J.~P. Bibring, J.~Biele, C.~Cenac-Morthe, F.~Cordero, B.~C
 \bibitem{minelva:online}
 宇宙航空研究開発機構.
 \newblock アポフィス観測の国際状況.
+\newblock \url{https://www8.cao.go.jp/space/comittee/27-kagaku/kagaku-dai62/siryou3.pdf}, accessed 2025-05-07.
 
 \bibitem{探査ロボット「ミ5:online}
 宇宙航空研究開発機構（JAXA）宇宙科学研究所.
