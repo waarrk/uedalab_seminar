@@ -8,6 +8,10 @@ Esa - hera asteroid mission’s cubesat passengers signal home.
 Esa - rosetta.
 \newblock \url{https://www.esa.int/Science_Exploration/Space_Science/Rosetta}, accessed 2025-05-07.
 
+\bibitem{SpaceHop55:online}
+Spacehopper - legged locomotion for low-gravity environments ethz.
+\newblock \url{https://spacehopper.ethz.ch/}, accessed 2025-05-08.
+
 \bibitem{iso17981}
 {International Organization for Standardization}.
 \newblock Iso 17981:2024 space systems ― cube satellite (cubesat) interface.
